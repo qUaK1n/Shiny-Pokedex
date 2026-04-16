@@ -1,4 +1,24 @@
-﻿<!DOCTYPE html>
+﻿<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAdJQKjtjj4SZIg4pK9NF6ZO30uF9m11Xs",
+        authDomain: "shiny-pokedex-f719f.firebaseapp.com",
+        projectId: "shiny-pokedex-f719f",
+        storageBucket: "shiny-pokedex-f719f.firebasestorage.app",
+        messagingSenderId: "82854355253",
+        appId: "1:82854355253:web:9a4c428381376551776c7c",
+        measurementId: "G-JHWE9LY8W5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+</script>
+
+<!DOCTYPE html>
 <html>
 <head>
     <title>ShinyPokédexTracker</title>
@@ -9,6 +29,6 @@
     <h1>✨ Shiny Pokédex ✨</h1>
     <div id="pokedex"></div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

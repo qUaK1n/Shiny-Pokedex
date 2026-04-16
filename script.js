@@ -1,4 +1,12 @@
-﻿const generations = {
+﻿import {
+    doc,
+    setDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const db = window.db;
+
+const generations = {
     "Gen 1 (Kanto)": { start: 1, end: 151 },
     "Gen 2 (Johto)": { start: 152, end: 251 },
     "Gen 3 (Hoenn)": { start: 252, end: 386 },
@@ -90,42 +98,44 @@ let genStates = JSON.parse(localStorage.getItem(genStateKey)) || {};
 
 const container = document.getElementById("pokedex");
 
-// Load saved data first
-const saved = localStorage.getItem("pokedex");
+async function loadData() {
+    const docRef = doc(db, "pokedex", "main");
+    const docSnap = await getDoc(docRef);
 
-if (saved) {
-    pokemon = JSON.parse(saved);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
 
-    pokemon = pokemon.map((p, index) => ({
-        name: p.name,
-        id: p.id ?? index + 1,
-        caught: p.caught ?? false,
-        variants: p.variants ?? []
-    }));
+        pokemon = data.pokemon;
+        genStates = data.genStates || {};
 
-    render();
-} else {
-    fetch("https://pokeapi.co/api/v2/pokemon?limit=1025")
-        .then(res => res.json())
-        .then(data => {
-            pokemon = data.results.map((p, index) => {
-                const id = index + 1;
+        render();
+        updateGlobalProgress?.();
+    } else {
+        fetch("https://pokeapi.co/api/v2/pokemon?limit=1025")
+            .then(res => res.json())
+            .then(data => {
+                pokemon = data.results.map((p, index) => {
+                    const id = index + 1;
 
-                return {
-                    name: capitalize(p.name),
-                    id: id,
-                    caught: false,
-                    variants: (regionalVariants[id] || []).map(v => ({
-                        form: v,
-                        caught: false
-                    }))
-                };
+                    return {
+                        name: capitalize(p.name),
+                        id,
+                        caught: false,
+                        variants: (regionalVariants[id] || []).map(v => ({
+                            form: v,
+                            caught: false
+                        }))
+                    };
+                });
+
+                save();
+                render();
+                updateGlobalProgress?.();
             });
-
-            save();
-            render();
-        });
+    }
 }
+
+loadData();
 
 function capitalize(name) {
     return name.charAt(0).toUpperCase() + name.slice(1);
@@ -358,9 +368,11 @@ function toggleVariant(pIndex, vIndex) {
     render();
 }
 
-function save() {
-    localStorage.setItem("pokedex", JSON.stringify(pokemon));
-    localStorage.setItem(genStateKey, JSON.stringify(genStates));
+async function save() {
+    await setDoc(doc(db, "pokedex", "main"), {
+        pokemon,
+        genStates
+    });
 }
 
 function updateGlobalProgress() {
