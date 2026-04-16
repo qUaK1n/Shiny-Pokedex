@@ -1,8 +1,8 @@
-﻿#pokedex {
+#pokedex {
     display: grid;
     grid-template-columns: repeat(auto-fill, 80px);
     gap: 10px;
-    justify-content: center;
+    justify-content: center; /* 🔥 THIS fixes the alignment */
 }
 
 h1 
