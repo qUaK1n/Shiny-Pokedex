@@ -116,6 +116,7 @@ function render() {
         div.setAttribute("data-index", index);
 
         const img = document.createElement("img");
+        img.loading = "lazy";
 
         const baseURL =
             "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
